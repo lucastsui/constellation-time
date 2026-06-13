@@ -1,0 +1,41 @@
+% Constellation-time architecture diagram
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, rounded corners=1pt, align=center, inner sep=3pt, minimum height=5.5mm},
+  layer/.style={draw=black!60, rounded corners=2pt, inner sep=4pt},
+  arr/.style={-{Stealth[length=2mm]}, thick, black!70},
+  lbl/.style={font=\scriptsize\itshape, black!60}
+]
+\def\colw{7.6cm}
+
+% ---- source layer ----
+\node[box, minimum width=1.75cm] (osc) {local\\oscillator};
+\node[box, minimum width=1.75cm, right=2.2mm of osc] (isl) {ISL two-way\\exchanges};
+\node[box, minimum width=1.75cm, right=2.2mm of isl] (gnss) {GNSS\\receiver};
+\node[box, minimum width=1.75cm, right=2.2mm of gnss] (gw) {gateway\\passes};
+\node[lbl, anchor=west] at ($(osc.west)+(-0.05,0.62)$) {time sources};
+
+% ---- service layer ----
+\node[box, minimum width=3.7cm, above=8.5mm of $(isl.north)!0.5!(gnss.north)$, xshift=-1.9cm] (filter)
+  {interval clock service\\estimate $t$, track bound $\varepsilon$};
+\node[box, minimum width=3.4cm, right=3mm of filter] (model)
+  {proper-time and geometry\\model from ephemerides};
+\node[lbl, anchor=west] at ($(filter.west)+(-0.35,0.72)$) {per-satellite time service};
+
+% ---- consumer layer ----
+\node[box, above=8.5mm of filter.north, xshift=1.7cm, minimum width=7.2cm] (apps)
+  {commit wait \; $\cdot$ \; leases \; $\cdot$ \; link TDMA \; $\cdot$ \; snapshots \; $\cdot$ \; tracing};
+\node[lbl, anchor=west] at ($(apps.west)+(-0.05,0.62)$) {operating-system primitives};
+
+% ---- arrows ----
+\draw[arr] (osc.north) -- ($(filter.south)+(-1.2,0)$);
+\draw[arr] (isl.north) -- ($(filter.south)+(-0.2,0)$);
+\draw[arr] (gnss.north) -- ($(filter.south)+(0.8,0)$);
+\draw[arr] (gw.north) to[out=90,in=-60] ($(filter.south east)+(-0.1,0.02)$);
+\draw[arr] (model.west) -- (filter.east);
+\draw[arr] (filter.north) -- ($(apps.south)+(-1.7,0)$);
+
+% ---- schedule annotation ----
+\draw[arr, dashed] (model.north) to[out=90,in=-20] node[lbl, right, pos=0.35, align=left]
+  {sync schedule computed\\ahead for a full period} ($(apps.south east)+(-0.45,0)$);
+\end{tikzpicture}
