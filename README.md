@@ -8,20 +8,20 @@ Low-Earth-orbit constellations are turning from communication relays into comput
 
 ## TL;DR
 
-GPS manufactures time on the ground and broadcasts it one way to passive receivers. An orbital data center inverts every assumption behind that design — commodity oscillators instead of atomic standards, a ground station that sees each satellite roughly 0.5% of the time, time consumed *inside* the constellation by neighboring satellites, and a relativistic rate offset that changes sign. The paper:
+GPS manufactures time on the ground and broadcasts it one way to passive receivers. An orbital data center inverts every assumption behind that design: commodity oscillators instead of atomic standards, a ground station that sees each satellite roughly 0.5% of the time, time consumed *inside* the constellation by neighboring satellites, and a relativistic rate offset that changes sign. The paper:
 
 - makes the GPS timekeeping assumptions explicit and shows each one fails in orbit;
-- derives that **ordering correctness between satellites needs agreement only at the inter-satellite light time** — about 70 µs at the closest approach of a dispersed shell, and a third of a microsecond in close formation — a bar GNSS clears by orders of magnitude;
-- shows that for an operator unwilling to depend on GNSS, **two-way time transfer over inter-satellite links** works in the commodity regime: the dominant error (satellite motion during the exchange, hundreds of nanoseconds) collapses to **sub-picosecond** once corrected with predicted orbits — three orders of magnitude below the nanosecond hardware-timestamping floor;
+- derives that **ordering correctness between satellites needs agreement only at the inter-satellite light time** (about 70 µs at the closest approach of a dispersed shell, a third of a microsecond in close formation), which GNSS clears by orders of magnitude;
+- shows that for an operator unwilling to depend on GNSS, **two-way time transfer over inter-satellite links** works in the commodity regime: the dominant error (satellite motion during the exchange, hundreds of nanoseconds) collapses to **sub-picosecond** once corrected with predicted orbits, three orders of magnitude below the nanosecond hardware-timestamping floor;
 - proposes **constellation time**, a layered architecture that serves time as an interval with an explicit uncertainty bound (in the spirit of Spanner's TrueTime), models the orbit's relativistic and thermal clock dynamics, and maintains the bound through scheduled exchanges computed ahead from geometry.
 
 ## Paper
 
-[`main.pdf`](main.pdf) — full text. LaTeX source in [`main.tex`](main.tex).
+[`main.pdf`](main.pdf) is the full paper; the LaTeX source is in [`main.tex`](main.tex).
 
 ## Reproducing the numbers
 
-Every computed value in the paper comes from `derivations.py` — orbital geometry, relativistic rates, and error budgets, all from physical constants and the stated assumptions.
+Every computed value in the paper comes from `derivations.py`: orbital geometry, relativistic rates, and error budgets, all from physical constants and the stated assumptions.
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
